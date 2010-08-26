@@ -50,6 +50,10 @@ include('settings.php');
             padding: 0;
         }
 
+        a {
+            color: #fff;
+        }
+
         body {
             color: #fff;
             font: 15px/1.3 sans-serif;
@@ -57,7 +61,7 @@ include('settings.php');
 
         h1 {
             font-family: serif;
-            font-size: 120px;
+            font-size: 140px;
             line-height: 1;
             margin-top: -60px;
             position: absolute;
@@ -72,16 +76,12 @@ include('settings.php');
         }
 
         h1.yes {
-            -webkit-animation-name: party;
-            -webkit-animation-duration: 1s;
-            -webkit-animation-iteration-count: infinite;
-            -webkit-animation-timing-function: linear;
             color: #0a0;
             text-shadow: 0 0 70px #0a0;
         }
 
         html {
-            background: #111;
+            background: #151515;
         }
 
         p {
@@ -92,6 +92,16 @@ include('settings.php');
             background: #000;
             float: right;
             padding: 20px;
+        }
+
+        #open-source {
+            background: #000;
+            bottom: 0;
+            font-size: 11px;
+            left: 0;
+            margin: 0;
+            padding: 5px;
+            position: absolute;
         }
     </style>
     <script type="text/javascript">
@@ -132,5 +142,6 @@ include('settings.php');
         <p><fb:like colorscheme="dark"></fb:like></p>
     </div>
 <?php endif; ?>
+    <p id="open-source">Är du en nörd? Bidra! <a href="http://github.com/blixt/fred.ag">fred.ag @ GitHub</a></p>
 </body>
 </html>
