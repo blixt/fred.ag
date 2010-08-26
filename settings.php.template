@@ -1,3 +1,4 @@
 <?php
 define('ANALYTICS_ID', '');
+define('FACEBOOK_APP_ID', '');
 ?>
