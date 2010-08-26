@@ -23,7 +23,7 @@ switch (date('w')) {
         break;
 }
 
-$path = '/' . ($day == 'fredag' ? '' : $day);
+$path = '/' . ($day == 'fredag' ? '' : urlencode($day));
 if ($_SERVER['REQUEST_URI'] != $path) {
     header('Location: http://fred.ag' . $path, true, 302);
     exit;
@@ -133,6 +133,12 @@ include('settings.php');
     <h1 class="yes">fredag!</h1>
     <div id="like">
         <p>It's party time!!! Alla gillar fredagar, eller?</p>
+        <p><fb:like colorscheme="dark"></fb:like></p>
+    </div>
+<?php elseif ($day == 'lördag' || $day == 'söndag'): ?>
+    <h1 class="yes">:)</h1>
+    <div id="like">
+        <p>Det är inte fredag, men att det är <?php echo $day; ?> är inte så dåligt det heller!</p>
         <p><fb:like colorscheme="dark"></fb:like></p>
     </div>
 <?php else: ?>
