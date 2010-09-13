@@ -6,6 +6,8 @@ $year = date('o');
 $week = date('W');
 $day = date('N');
 
+$today = "$year-W$week-$day";
+
 $request = $_SERVER['REQUEST_URI'];
 if (preg_match('#^/(\\d{4})/(\\d{2})$#', $request, $match)) {
     // Invalid values and Fridays that haven't happened yet will return 404.
@@ -36,6 +38,8 @@ if ($request != $path) {
     header('Location: http://fred.ag' . $path, true, 302);
     exit;
 }
+
+$shownDay = "$year-W$week-$day";
 
 $months = array(
     'January' => 'januari',
@@ -100,7 +104,11 @@ include('settings.php');
             text-shadow: 0 0 70px #c00;
         }
 
-        h1.yes {
+        h1.past {
+            color: #030;
+        }
+
+        h1.today {
             color: #0a0;
             text-shadow: 0 0 70px #0a0;
         }
@@ -155,11 +163,19 @@ include('settings.php');
             document.getElementById('fb-root').appendChild(e);
         })();
     </script>
-    <h1 class="yes">fredag!</h1>
+<?php     if ($shownDay == $today): ?>
+    <h1 class="today">fredag!</h1>
     <div id="like">
         <p>It's party time!!! Alla gillar fredagar, eller?</p>
         <p><fb:like colorscheme="dark"></fb:like></p>
     </div>
+<?php     else: ?>
+    <h1 class="past">fredag!</h1>
+    <div id="like">
+        <p>Denna fredag har kommit och gått. Var den bra?</p>
+        <p><fb:like colorscheme="dark"></fb:like></p>
+    </div>
+<?php     endif; ?>
 <?php else: ?>
     <h1 class="no">:(</h1>
 <?php endif; ?>
