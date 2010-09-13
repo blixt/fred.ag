@@ -1,35 +1,62 @@
 <?php
-switch (date('w')) {
-    case 0:
-        $day = 'söndag';
-        break;
-    case 1:
-        $day = 'måndag';
-        break;
-    case 2:
-        $day = 'tisdag';
-        break;
-    case 3:
-        $day = 'onsdag';
-        break;
-    case 4:
-        $day = 'torsdag';
-        break;
-    case 5:
-        $day = 'fredag';
-        break;
-    case 6:
-        $day = 'lördag';
-        break;
+function not_found() {
+    header('HTTP/1.0 404 Not Found');
+    exit;
 }
 
-$path = '/' . ($day == 'fredag' ? '' : urlencode($day));
-if ($_SERVER['REQUEST_URI'] != $path) {
+$year = date('Y');
+$week = date('W');
+
+$request = $_SERVER['REQUEST_URI'];
+if (preg_match('#^/(\\d+)/(\\d+)$#', $request, $match)) {
+    // Fridays that haven't happened yet will return 404.
+    if ($match[1] > $year || ($match[1] == $year && $match[2] > ($day >= 5 ? $week : $week - 1))) {
+        not_found();
+    }
+
+    // Change values according to requested year and week.
+    $year = $match[1];
+    $week = $match[2];
+    $day = 5;
+} else if ($request != '/') {
+    // Return 404 for invalid paths.
+    not_found();
+} else {
+    $day = date('w');
+}
+
+// Return 404 for invalid values and non-Fridays.
+if ($year < 0 || $week < 1 || $week > 53 || $day != 5) not_found();
+
+// Generate a path for current year/week and make sure the browser is on that path.
+$path = sprintf('/%d/%d', $year, $week);
+if ($request != $path) {
     header('Location: http://fred.ag' . $path, true, 302);
     exit;
 }
 
-$title = ucfirst($day);
+// Get a timestamp for the Friday of the specified date.
+// Count from '0104' because January 4th is always in week 1 (according to ISO 8601).
+// FIXME: Does not work correctly for week 53: http://fred.ag/2009/53
+$time = strtotime($year . '0104 +' . ($week - 1) . ' weeks');
+$timeDay = date('w', $time);
+$time = strtotime(($timeDay <= 5 ? '+' : '') . (5 - $timeDay) . ' days', $time);
+
+$months = array(
+    'January' => 'januari',
+    'February' => 'februari',
+    'March' => 'mars',
+    'April' => 'april',
+    'May' => 'maj',
+    'June' => 'juni',
+    'July' => 'juli',
+    'August' => 'augusti',
+    'September' => 'september',
+    'October' => 'oktober',
+    'November' => 'november',
+    'December' => 'december'
+);
+$friday = 'Fredagen den ' . strtr(date('j:\\e F, Y (\\v\\e\\c\\k\\a W)', $time), $months);
 
 include('settings.php');
 ?>
@@ -37,12 +64,12 @@ include('settings.php');
 <html>
 <head>
     <meta charset="UTF-8">
-    <title><?php echo $title; ?></title>
-    <meta property="og:title" content="<?php echo $title; ?>">
+    <title>fredag</title>
+    <meta property="og:title" content="fredag">
     <meta property="og:type" content="activity">
     <meta property="og:url" content="http://fred.ag<?php echo $path; ?>">
     <meta property="og:site_name" content="fred.ag">
-    <meta property="og:description" content="Det är <?php echo $day ?>!">
+    <meta property="og:description" content="<?php echo $friday; ?>">
     <meta property="fb:app_id" content="<?php echo FACEBOOK_APP_ID ?>">
     <style type="text/css">
         * {
@@ -60,24 +87,16 @@ include('settings.php');
         }
 
         h1 {
+            color: #0a0;
             font-family: serif;
             font-size: 140px;
             line-height: 1;
             margin-top: -60px;
             position: absolute;
             text-align: center;
+            text-shadow: 0 0 70px #0a0;
             top: 50%;
             width: 100%;
-        }
-
-        h1.no {
-            color: #c00;
-            text-shadow: 0 0 70px #c00;
-        }
-
-        h1.yes {
-            color: #0a0;
-            text-shadow: 0 0 70px #0a0;
         }
 
         html {
@@ -129,25 +148,11 @@ include('settings.php');
         document.getElementById('fb-root').appendChild(e);
     }());
 </script>
-<?php if ($day == 'fredag'): ?>
-    <h1 class="yes">fredag!</h1>
+    <h1>fredag!</h1>
     <div id="like">
         <p>It's party time!!! Alla gillar fredagar, eller?</p>
         <p><fb:like colorscheme="dark"></fb:like></p>
     </div>
-<?php elseif ($day == 'lördag' || $day == 'söndag'): ?>
-    <h1 class="yes">:)</h1>
-    <div id="like">
-        <p>Det är inte fredag, men att det är <?php echo $day; ?> är inte så dåligt det heller!</p>
-        <p><fb:like colorscheme="dark"></fb:like></p>
-    </div>
-<?php else: ?>
-    <h1 class="no">:(</h1>
-    <div id="like">
-        <p>Tyvärr, idag är en <?php echo $day; ?>. Du kanske gillar <?php echo $day; ?>ar?</p>
-        <p><fb:like colorscheme="dark"></fb:like></p>
-    </div>
-<?php endif; ?>
     <p id="open-source">Är du en nörd? Bidra! <a href="http://github.com/blixt/fred.ag">fred.ag @ GitHub</a></p>
 </body>
 </html>
