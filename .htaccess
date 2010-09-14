@@ -1,4 +1,11 @@
+# Make sure content is delivered as UTF-8.
 AddDefaultCharset utf-8
 
 RewriteEngine On
+
+# Send all requests to www.fred.ag to fred.ag.
+RewriteCond %{HTTP_HOST} ^www\.fred\.ag$
+RewriteRule (.*) http://fred.ag/$1 [R=301,L]
+
+# Send all requests to index.php.
 RewriteRule . index.php
