@@ -9,7 +9,7 @@ $day = date('N');
 $today = "$year-W$week-$day";
 
 $request = $_SERVER['REQUEST_URI'];
-if (preg_match('#^/(\\d{4})/(\\d{2})$#', $request, $match)) {
+if (preg_match('#^/(\\d{4})/(\\d{2})(\\.png)?$#', $request, $match)) {
     // Invalid values and Fridays that haven't happened yet will return 404.
     if (($match[1] < 1970 || $match[1] > $year) ||
         ($match[2] < 1 || $match[2] > 53) ||
@@ -23,9 +23,14 @@ if (preg_match('#^/(\\d{4})/(\\d{2})$#', $request, $match)) {
     $year = $match[1];
     $week = $match[2];
     $day = 5;
+
+    // Whether an image should be generated.
+    $image = !!$match[3];
 } else if ($request != '/') {
     header('HTTP/1.0 404 Not Found');
     exit;
+} else {
+    $image = false;
 }
 
 // Get a timestamp for the Friday of the specified date.
@@ -33,9 +38,21 @@ $time = strtotime("$year-W$week-5");
 
 // Generate a path for current year/week and make sure the browser is on that
 // path.
-$path = ($day == 5) ? date('/o/W', $time) : '/';
+$path = ($day == 5) ? date('/o/W', $time) . ($image ? '.png' : '') : '/';
 if ($request != $path) {
     header('Location: http://fred.ag' . $path, true, 302);
+    exit;
+}
+
+if ($image) {
+    $ih = imagecreatetruecolor(300, 300);
+    $textColor = imagecolorallocate($ih, 255, 255, 255);
+    imagettftext($ih, 171, 0, 20, 182, $textColor, './droidserif.ttf', $week);
+    imagettftext($ih, 85, 0, 20, 282, $textColor, './droidserif.ttf', $year);
+
+    header('Content-Type: image/png');
+    imagepng($ih);
+    imagedestroy($ih);
     exit;
 }
 
@@ -68,6 +85,7 @@ include('settings.php');
     <meta property="og:type" content="activity">
     <meta property="og:url" content="http://fred.ag<?php echo $path; ?>">
     <meta property="og:description" content="<?php echo 'Fredagen den ' . strtr(date('j:\\e F, Y (\\v\\e\\c\\k\\a W)', $time), $months); ?>">
+    <meta property="og:image" content="http://fred.ag<?php echo $path; ?>.png">
     <meta property="fb:app_id" content="<?php echo FACEBOOK_APP_ID ?>">
 <?php else: ?>
     <title>inte fredag</title>
