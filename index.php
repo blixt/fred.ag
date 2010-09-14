@@ -47,8 +47,8 @@ if ($request != $path) {
 if ($image) {
     $ih = imagecreatetruecolor(300, 300);
     $textColor = imagecolorallocate($ih, 255, 255, 255);
-    imagettftext($ih, 171, 0, 20, 182, $textColor, './droidserif.ttf', $week);
-    imagettftext($ih, 85, 0, 20, 282, $textColor, './droidserif.ttf', $year);
+    imagettftext($ih, 160, 0, 30, 184, $textColor, './droidserif.ttf', $week);
+    imagettftext($ih, 80, 0, 31, 269, $textColor, './droidserif.ttf', $year);
 
     header('Content-Type: image/png');
     imagepng($ih);
