@@ -67,7 +67,6 @@ include('settings.php');
     <meta property="og:title" content="fredag">
     <meta property="og:type" content="activity">
     <meta property="og:url" content="http://fred.ag<?php echo $path; ?>">
-    <meta property="og:site_name" content="fred.ag">
     <meta property="og:description" content="<?php echo 'Fredagen den ' . strtr(date('j:\\e F, Y (\\v\\e\\c\\k\\a W)', $time), $months); ?>">
     <meta property="fb:app_id" content="<?php echo FACEBOOK_APP_ID ?>">
 <?php else: ?>
