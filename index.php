@@ -1,6 +1,6 @@
 <?php
 if (!is_file('settings.php')) {
-  echo "You must include a settings.php for this application to work";
+  echo 'You need to copy settings.php.template to settings.php and set it up.';
   exit(1);
 }
 
@@ -66,63 +66,47 @@ if ($image) {
 
 $shownDay = "$year-W$week-$day";
 
-$months = array(
-    'January' => 'januari',
-    'February' => 'februari',
-    'March' => 'mars',
-    'April' => 'april',
-    'May' => 'maj',
-    'June' => 'juni',
-    'July' => 'juli',
-    'August' => 'augusti',
-    'September' => 'september',
-    'October' => 'oktober',
-    'November' => 'november',
-    'December' => 'december'
-);
-
-$_lang = isset($_GET[LANGUAGE_KEY]) ? $_GET[LANGUAGE_KEY] : LANGUAGE_DEFAULT;
-
-if (!array_key_exists($_lang, $_languages)) {
-  $_lang = LANGUAGE_DEFAULT;
+$language = isset($_GET[LANGUAGE_KEY]) ? $_GET[LANGUAGE_KEY] : LANGUAGE_DEFAULT;
+if (!array_key_exists($language, $languages)) {
+  $language = LANGUAGE_DEFAULT;
 }
 
-// must define $_translation
-include($_languages[$_lang]);
+// This file must define $translation.
+include $languages[$language];
 
 /*
- * Attempt to replace a key and a 'variadic' argument with a string replacement.
- * Or return just the attempted key, signalling a non-existing translation
- * usage: <?=_l("hello_world", array("Hej", "Världen"))?>
- */
+ * Attempt to replace a key and a 'variadic' argument with a string
+ * replacement. Or return just the attempted key, indicating a non-existing
+ * translation.
+ * Usage: <?=_l('hello_world', array('Hej', 'Världen'))?>
+ */ 
 function _l($key, $vars=array()) {
-  global $_translation;
-  
-  if (!isset($_translation[$key])) {
-    return "$_lang:$key";
-  }
-  
-  return vsprintf($_translation[$key], $vars);
+    global $translation;
+
+    if (!isset($translation[$key])) {
+        return "$language:$key";
+    }
+
+    return vsprintf($translation[$key], $vars);
 }
 
-header("content-type: text/html; charset=" . ENCODING);
+header('Content-type: text/html; charset=' . ENCODING);
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <?if ($day == 5): ?>
-        <title><?= _l("title") ?>></title>
-        <meta property="og:title" content="<?= _l("title") ?>">
+    <meta charset="<?= ENCODING ?>">
+    <? if ($day == 5): ?>
+        <title><?= _l('title') ?>></title>
+        <meta property="og:title" content="<?= _l('title') ?>">
         <meta property="og:type" content="activity">
         <meta property="og:url" content="http://fred.ag<?= $path ?>">
-        <meta property="og:description" content="<?= _("description", array(strtr(date('j:\\e F, Y (\\v\\e\\c\\k\\a W)', $time), $months))) ?>">
+        <meta property="og:description" content="<?= _('description', array(getDate($time))) ?>">
         <meta property="og:image" content="http://fred.ag<?= $path ?>.png">
-        <meta property="fb:app_id" content="<?php echo FACEBOOK_APP_ID ?>">
-    <?else: ?>
-        <title>inte fredag</title>
-    <?endif; ?>
+        <meta property="fb:app_id" content="<?= FACEBOOK_APP_ID ?>">
+    <? else: ?>
+        <title><?= _l('title_no') ?></title>
+    <? endif; ?>
     <style type="text/css">
         * {
             margin: 0;
@@ -199,7 +183,7 @@ header("content-type: text/html; charset=" . ENCODING);
     </script>
 </head>
 <body>
-    <?if ($day == 5):?>
+    <? if ($day == 5): ?>
         <div id="fb-root"></div>
         <script>
             window.fbAsyncInit = function () {
@@ -213,23 +197,23 @@ header("content-type: text/html; charset=" . ENCODING);
                 document.getElementById('fb-root').appendChild(e);
             })();
         </script>
-        <?if ($shownDay == $today): ?>
-            <h1 class="today"><?=_l("friday")?></h1>
+        <? if ($shownDay == $today): ?>
+            <h1 class="today"><?=_l('friday')?></h1>
             <div id="like">
-                <p><?= _l("today") ?></p>
+                <p><?= _l('today') ?></p>
                 <p><fb:like colorscheme="dark"></fb:like></p>
             </div>
-        <?else: ?>
-            <h1 class="past"><?=_l("friday")?></h1>
+        <? else: ?>
+            <h1 class="past"><?=_l('friday')?></h1>
             <div id="like">
-                <p><?= _l("past") ?></p>
+                <p><?= _l('past') ?></p>
                 <p><fb:like colorscheme="dark"></fb:like></p>
             </div>
-        <?endif;?>
-    <?else:?>
+        <? endif; ?>
+    <? else: ?>
         <h1 class="no">:(</h1>
-    <?endif;?>
-    
-    <p id="open-source"><?= _l("contribute", array("http://github.com/blixt/fred.ag", "fred.ag @ GitHub")) ?></p>
+    <? endif; ?>
+
+    <p id="open-source"><?= _l('contribute', array('http://github.com/blixt/fred.ag', 'fred.ag @ GitHub')) ?></p>
 </body>
 </html>
