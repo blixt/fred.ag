@@ -1,15 +1,19 @@
 <?php
-$_root = dirname(__FILE__);
+// The domain that the pages are served on. For example, "fred.ag". 
+define('DOMAIN', '');
 
 define('ANALYTICS_ID', '');
 define('FACEBOOK_APP_ID', '');
+
 define('LANGUAGE_KEY', 'l');
 define('LANGUAGE_DEFAULT', 'se');
 define('ENCODING', 'utf-8');
 
-// this must restrict the language keys, if they don't exist here, fallback to default.
+// This must restrict the language keys, if they don't exist here, fallback to
+// default.
+$_root = dirname(__FILE__);
 $_languages = array(
-  "se" => "$_root/i18n/se.php",
-  "en" => "$_root/i18n/en.php"
+  'se' => "$_root/i18n/se.php",
+  'en' => "$_root/i18n/en.php"
 );
 ?>

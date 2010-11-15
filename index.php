@@ -48,7 +48,7 @@ $time = strtotime("$year-W$week-5");
 // path.
 $path = ($day == 5) ? date('/o/W', $time) . ($image ? '.png' : '') : '/';
 if ($request != $path) {
-    header('Location: http://fred.ag' . $path, true, 302);
+    header('Location: http://' . DOMAIN . $path, true, 302);
     exit;
 }
 
@@ -100,9 +100,9 @@ header('Content-type: text/html; charset=' . ENCODING);
         <title><?= _l('title') ?>></title>
         <meta property="og:title" content="<?= _l('title') ?>">
         <meta property="og:type" content="activity">
-        <meta property="og:url" content="http://fred.ag<?= $path ?>">
+        <meta property="og:url" content="http://<?= DOMAIN . $path ?>">
         <meta property="og:description" content="<?= _('description', array(getDate($time))) ?>">
-        <meta property="og:image" content="http://fred.ag<?= $path ?>.png">
+        <meta property="og:image" content="http://<?= DOMAIN . $path ?>.png">
         <meta property="fb:app_id" content="<?= FACEBOOK_APP_ID ?>">
     <? else: ?>
         <title><?= _l('title_no') ?></title>
