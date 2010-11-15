@@ -12,7 +12,7 @@ $translation = array(
 /*
  * Returns the date of the specified timestamp as a string.
  */
-function getDate($time) {
+function getDateString($time) {
     return date('jS \\o\\f F (\\w\\e\\e\\k W)', $time);
 }
 ?>

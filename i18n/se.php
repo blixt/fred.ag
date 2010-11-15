@@ -27,7 +27,7 @@ $_months = array(
 /*
  * Returns the date of the specified timestamp as a string.
  */
-function getDate($time) {
+function getDateString($time) {
     global $_months;
     return strtr(date('j:\\e F, Y (\\v\\e\\c\\k\\a W)', $time), $_months);
 }

@@ -1,6 +1,6 @@
 <?php
 if (!is_file('settings.php')) {
-  echo 'You need to copy settings.php.template to settings.php and set it up.';
+  echo 'You need to run init.sh to set up settings.php.';
   exit(1);
 }
 
@@ -15,7 +15,8 @@ $day = date('N');
 
 $today = "$year-W$week-$day";
 
-$request = $_SERVER['REQUEST_PATH'];
+// Get the unmodified request URI, then remove the query string.
+$request = preg_replace('#\\?.*#', '', $_SERVER['REQUEST_URI']);
 
 if (preg_match('#^/(\\d{4})/(\\d{2})(\\.png)?$#', $request, $match)) {
     // Invalid values and Fridays that haven't happened yet will return 404.
@@ -101,7 +102,7 @@ header('Content-type: text/html; charset=' . ENCODING);
         <meta property="og:title" content="<?= _l('title') ?>">
         <meta property="og:type" content="activity">
         <meta property="og:url" content="http://<?= DOMAIN . $path ?>">
-        <meta property="og:description" content="<?= _('description', array(getDate($time))) ?>">
+        <meta property="og:description" content="<?= _l('description', array(getDateString($time))) ?>">
         <meta property="og:image" content="http://<?= DOMAIN . $path ?>.png">
         <meta property="fb:app_id" content="<?= FACEBOOK_APP_ID ?>">
     <? else: ?>
