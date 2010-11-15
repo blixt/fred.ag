@@ -98,7 +98,7 @@ header('Content-type: text/html; charset=' . ENCODING);
 <head>
     <meta charset="<?= ENCODING ?>">
     <? if ($day == 5): ?>
-        <title><?= _l('title') ?>></title>
+        <title><?= _l('title') ?></title>
         <meta property="og:title" content="<?= _l('title') ?>">
         <meta property="og:type" content="activity">
         <meta property="og:url" content="http://<?= DOMAIN . $path ?>">
