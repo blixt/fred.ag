@@ -12,7 +12,7 @@ define('ENCODING', '$CHARSET');
 // This must restrict the language keys, if they don't exist here, fall back to
 // default.
 \$_root = dirname(__FILE__);
-\$_languages = array(
+\$languages = array(
   'se' => \"\$_root/i18n/se.php\",
   'en' => \"\$_root/i18n/en.php\"
 );
