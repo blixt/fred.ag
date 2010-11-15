@@ -1,4 +1,11 @@
 <?php
+if (!is_file('settings.php')) {
+  echo "You must include a settings.php for this application to work";
+  exit(1);
+}
+
+include('settings.php');
+
 // Get the ISO 8601 week year, number and day. The year may differ from the
 // Gregorian calendar year since ISO 8601 years only consist of whole weeks,
 // which may be a bit confusing.
@@ -8,7 +15,8 @@ $day = date('N');
 
 $today = "$year-W$week-$day";
 
-$request = $_SERVER['REQUEST_URI'];
+$request = $_SERVER['REQUEST_PATH'];
+
 if (preg_match('#^/(\\d{4})/(\\d{2})(\\.png)?$#', $request, $match)) {
     // Invalid values and Fridays that haven't happened yet will return 404.
     if (($match[1] < 1970 || $match[1] > $year) ||
@@ -73,23 +81,48 @@ $months = array(
     'December' => 'december'
 );
 
-include('settings.php');
+$_lang = isset($_GET[LANGUAGE_KEY]) ? $_GET[LANGUAGE_KEY] : LANGUAGE_DEFAULT;
+
+if (!array_key_exists($_lang, $_languages)) {
+  $_lang = LANGUAGE_DEFAULT;
+}
+
+// must define $_translation
+include($_languages[$_lang]);
+
+/*
+ * Attempt to replace a key and a 'variadic' argument with a string replacement.
+ * Or return just the attempted key, signalling a non-existing translation
+ * usage: <?=_l("hello_world", array("Hej", "Världen"))?>
+ */
+function _l($key, $vars=array()) {
+  global $_translation;
+  
+  if (!isset($_translation[$key])) {
+    return "$_lang:$key";
+  }
+  
+  return vsprintf($_translation[$key], $vars);
+}
+
+header("content-type: text/html; charset=" . ENCODING);
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-<?php if ($day == 5): ?>
-    <title>fredag</title>
-    <meta property="og:title" content="fredag">
-    <meta property="og:type" content="activity">
-    <meta property="og:url" content="http://fred.ag<?php echo $path; ?>">
-    <meta property="og:description" content="<?php echo 'Fredagen den ' . strtr(date('j:\\e F, Y (\\v\\e\\c\\k\\a W)', $time), $months); ?>">
-    <meta property="og:image" content="http://fred.ag<?php echo $path; ?>.png">
-    <meta property="fb:app_id" content="<?php echo FACEBOOK_APP_ID ?>">
-<?php else: ?>
-    <title>inte fredag</title>
-<?php endif; ?>
+    <?if ($day == 5): ?>
+        <title><?= _l("title") ?>></title>
+        <meta property="og:title" content="<?= _l("title") ?>">
+        <meta property="og:type" content="activity">
+        <meta property="og:url" content="http://fred.ag<?= $path ?>">
+        <meta property="og:description" content="<?= _("description", array(strtr(date('j:\\e F, Y (\\v\\e\\c\\k\\a W)', $time), $months))) ?>">
+        <meta property="og:image" content="http://fred.ag<?= $path ?>.png">
+        <meta property="fb:app_id" content="<?php echo FACEBOOK_APP_ID ?>">
+    <?else: ?>
+        <title>inte fredag</title>
+    <?endif; ?>
     <style type="text/css">
         * {
             margin: 0;
@@ -156,7 +189,7 @@ include('settings.php');
     </style>
     <script>
         var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', '<?php echo ANALYTICS_ID; ?>']);
+        _gaq.push(['_setAccount', '<?= ANALYTICS_ID; ?>']);
         _gaq.push(['_trackPageview']);
         (function() {
             var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
@@ -166,36 +199,37 @@ include('settings.php');
     </script>
 </head>
 <body>
-<?php if ($day == 5): ?>
-    <div id="fb-root"></div>
-    <script>
-        window.fbAsyncInit = function () {
-            FB.init({appId: '<?php echo FACEBOOK_APP_ID ?>', status: true, cookie: true, xfbml: true});
-        };
-
-        (function () {
-            var e = document.createElement('script');
-            e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
-            e.async = true;
-            document.getElementById('fb-root').appendChild(e);
-        })();
-    </script>
-<?php     if ($shownDay == $today): ?>
-    <h1 class="today">fredag!</h1>
-    <div id="like">
-        <p>It's party time!!! Alla gillar fredagar, eller?</p>
-        <p><fb:like colorscheme="dark"></fb:like></p>
-    </div>
-<?php     else: ?>
-    <h1 class="past">fredag!</h1>
-    <div id="like">
-        <p>Denna fredag har kommit och gått. Var den bra?</p>
-        <p><fb:like colorscheme="dark"></fb:like></p>
-    </div>
-<?php     endif; ?>
-<?php else: ?>
-    <h1 class="no">:(</h1>
-<?php endif; ?>
-    <p id="open-source">Är du en nörd? Bidra! <a href="http://github.com/blixt/fred.ag">fred.ag @ GitHub</a></p>
+    <?if ($day == 5):?>
+        <div id="fb-root"></div>
+        <script>
+            window.fbAsyncInit = function () {
+                FB.init({appId: '<?= FACEBOOK_APP_ID ?>', status: true, cookie: true, xfbml: true});
+            };
+            
+            (function () {
+                var e = document.createElement('script');
+                e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+                e.async = true;
+                document.getElementById('fb-root').appendChild(e);
+            })();
+        </script>
+        <?if ($shownDay == $today): ?>
+            <h1 class="today"><?=_l("friday")?></h1>
+            <div id="like">
+                <p><?= _l("today") ?></p>
+                <p><fb:like colorscheme="dark"></fb:like></p>
+            </div>
+        <?else: ?>
+            <h1 class="past"><?=_l("friday")?></h1>
+            <div id="like">
+                <p><?= _l("past") ?></p>
+                <p><fb:like colorscheme="dark"></fb:like></p>
+            </div>
+        <?endif;?>
+    <?else:?>
+        <h1 class="no">:(</h1>
+    <?endif;?>
+    
+    <p id="open-source"><?= _l("contribute", array("http://github.com/blixt/fred.ag", "fred.ag @ GitHub")) ?></p>
 </body>
 </html>
