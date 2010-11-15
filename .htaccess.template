@@ -1,0 +1,11 @@
+# Make sure content is delivered with the correct character set.
+AddDefaultCharset $CHARSET
+
+RewriteEngine On
+
+# Send all requests to the naked domain.
+#RewriteCond %{HTTP_HOST} \.$DOMAIN_ESCAPED\$
+#RewriteRule (.*) http://$DOMAIN/\$1 [R=301,L]
+
+# Send all requests to index.php.
+RewriteRule . index.php

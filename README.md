@@ -2,7 +2,15 @@
 
 ## Information
 
-A very simple site informing the user whether today is Friday (fredag in Swedish.)
+A very simple site informing the user whether today is Friday (fredag in
+Swedish.)
+
+## Setting it up
+
+If you want to get this running on your server, run the `init.sh` script and
+follow the instructions. Then fill in the blanks in `settings.php` (optional).
+
+Requires Apache and PHP to run.
 
 ## MIT license
 
